@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">List</string>
+    <!-- Lists -->
+    <string name="desc_rating_icon">Rating icon</string>
+    <string name="error_loading_products">Error loading products.</string>
+    <string name="no_products_found">No products found.</string>
+    <string name="error_loading_more_products">Error loading more products: %1$s</string>
+    <string name="search_placeholder">Search products…</string>
+    <string name="product_image_content_description">Product image</string>
+    <string name="error_loading_image">Error loading image</string>
+    <string name="rating_icon_content_description">Rating icon</string>
+    <string name="error_unknown">Unknown error</string>
+</resources>

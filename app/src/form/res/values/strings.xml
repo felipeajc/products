@@ -1,0 +1,37 @@
+<resources>
+    <string name="app_name">Form</string>
+    <string name="error_name_required">Name is required</string>
+    <string name="error_email_required">Email is required</string>
+    <string name="error_email_invalid">Invalid email</string>
+    <string name="error_number_required">Phone number is required</string>
+    <string name="error_number_digits_only">Only digits are allowed</string>
+    <string name="error_promo_required">Promo code is required</string>
+    <string name="error_promo_no_accents">Accents are not allowed</string>
+    <string name="error_promo_invalid_format">Only uppercase letters and hyphens (3–7 characters)</string>
+    <string name="error_date_required">Delivery date is required</string>
+    <string name="error_date_monday">Delivery cannot be on a Monday</string>
+    <string name="error_date_future">Date cannot be in the future</string>
+    <string name="error_rating_required">Rating is required</string>
+
+    <string name="form_name_label">User name</string>
+    <string name="form_email_label">Email</string>
+    <string name="form_phone_label">Phone number</string>
+    <string name="form_promo_code_label">Promo code</string>
+    <string name="form_rating_label">Rating</string>
+    <string name="form_date_label">Delivery date</string>
+    <string name="form_select_date">Select date</string>
+    <string name="form_submit">Submit</string>
+    <string name="form_success">Form successfully submitted!</string>
+
+    <!-- Ratings -->
+    <string name="rating_poor">Poor</string>
+    <string name="rating_fair">Fair</string>
+    <string name="rating_good">Good</string>
+    <string name="rating_very_good">Very Good</string>
+    <string name="rating_excellent">Excellent</string>
+
+    <!-- Content descriptions -->
+    <string name="desc_open_date_picker">Open date picker</string>
+
+
+</resources>
