@@ -45,7 +45,6 @@ fun ProductListScreen(
     )
 }
 
-
 @Composable
 fun ProductListScreenContent(
     uiState: ProductListUiState,
@@ -56,8 +55,6 @@ fun ProductListScreenContent(
 
     var query by remember { mutableStateOf(uiState.searchQuery) }
     var active by remember { mutableStateOf(false) }
-
-    val context = androidx.compose.ui.platform.LocalContext.current
 
     Column(
         modifier = Modifier
@@ -82,71 +79,83 @@ fun ProductListScreenContent(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-        ) {
-            val isLoading = uiState.isLoading || pagingItems.loadState.refresh is LoadState.Loading
-            val isError = pagingItems.loadState.refresh is LoadState.Error
-            val isEmpty = pagingItems.itemCount == 0 &&
+        ProductListStateWrapper(
+            isLoading = uiState.isLoading || pagingItems.loadState.refresh is LoadState.Loading,
+            isError = pagingItems.loadState.refresh is LoadState.Error,
+            isEmpty = pagingItems.itemCount == 0 &&
                     pagingItems.loadState.refresh is LoadState.NotLoading &&
-                    !isLoading && !isError &&
-                    uiState.searchQuery.isNotBlank()
+                    !uiState.isLoading &&
+                    uiState.searchQuery.isNotBlank(),
+            pagingItems = pagingItems,
+            onItemClick = onItemClick
+        )
+    }
+}
 
-            when {
-                isLoading -> {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                }
+@Composable
+private fun ProductListStateWrapper(
+    isLoading: Boolean,
+    isError: Boolean,
+    isEmpty: Boolean,
+    pagingItems: androidx.paging.compose.LazyPagingItems<ProductUiModel>,
+    onItemClick: (productId: Int) -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        when {
+            isLoading -> {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }
 
-                isError -> {
-                    Text(
-                        text = stringResource(R.string.error_loading_products),
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
+            isError -> {
+                Text(
+                    text = stringResource(R.string.error_loading_products),
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
 
-                isEmpty -> {
-                    Text(
-                        text = stringResource(R.string.no_products_found),
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
+            isEmpty -> {
+                Text(
+                    text = stringResource(R.string.no_products_found),
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
 
-                else -> {
-                    LazyColumn {
-                        items(pagingItems.itemSnapshotList.items) { product ->
-                            ProductItem(
-                                product = product,
-                                onClick = { onItemClick(product.id) }
-                            )
-                        }
+            else -> {
+                LazyColumn {
+                    items(pagingItems.itemSnapshotList.items) { product ->
+                        ProductItem(
+                            product = product,
+                            onClick = { onItemClick(product.id) }
+                        )
+                    }
 
-                        item {
-                            when (val state = pagingItems.loadState.append) {
-                                is LoadState.Loading -> {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(16.dp),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        CircularProgressIndicator()
-                                    }
+                    item {
+                        when (val appendState = pagingItems.loadState.append) {
+                            is LoadState.Loading -> {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator()
                                 }
-
-                                is LoadState.Error -> {
-                                    Text(
-                                        text = stringResource(
-                                            R.string.error_loading_more_products,
-                                            state.error.message ?: ""
-                                        ),
-                                        modifier = Modifier.padding(16.dp)
-                                    )
-                                }
-
-                                else -> Unit
                             }
+
+                            is LoadState.Error -> {
+                                Text(
+                                    text = stringResource(
+                                        R.string.error_loading_more_products,
+                                        appendState.error.message ?: ""
+                                    ),
+                                    modifier = Modifier.padding(16.dp)
+                                )
+                            }
+
+                            else -> Unit
                         }
                     }
                 }

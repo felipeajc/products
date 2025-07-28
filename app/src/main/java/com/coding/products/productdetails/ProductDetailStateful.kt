@@ -30,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import coil.request.CachePolicy
@@ -38,7 +39,7 @@ import com.coding.products.R
 import com.coding.products.model.ProductUiModel
 
 @Composable
-fun ProductDetailScreen(
+fun ProductDetailStateful(
     productId: Int,
     viewModel: ProductDetailViewModel = hiltViewModel()
 ) {
@@ -46,64 +47,70 @@ fun ProductDetailScreen(
     val context = LocalContext.current
 
     LaunchedEffect(productId) {
-        viewModel.loadProduct(context = context, id = productId)
+        viewModel.loadProduct(context, productId)
     }
 
     when {
         uiState.isLoading -> {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
                 CircularProgressIndicator()
             }
         }
 
         uiState.errorMessage != null -> {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = uiState.errorMessage ?: stringResource(R.string.error_unknown))
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(uiState.errorMessage ?: stringResource(R.string.error_unknown))
             }
         }
 
         uiState.product != null -> {
-            ProductDetailContent(product = uiState.product!!)
+            ProductDetailStateless(product = uiState.product!!)
         }
     }
 }
 
 @Composable
-fun ProductDetailContent(product: ProductUiModel) {
+fun ProductDetailStateless(product: ProductUiModel) {
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
+    val config = LocalConfiguration.current
+    val density = LocalDensity.current
+
+    val screenHeight = config.screenHeightDp.dp
+    val imageHeightPx = with(density) { (screenHeight * 0.4f).roundToPx() }
+
+    val screenWidth = config.screenWidthDp.dp
+    val imageWidthPx = with(density) { screenWidth.roundToPx() }
+
+    val imageRequest = ImageRequest.Builder(context)
+        .data(product.thumbnailUrl)
+        .size(imageWidthPx, imageHeightPx)
+        .crossfade(true)
+        .memoryCachePolicy(CachePolicy.ENABLED)
+        .diskCachePolicy(CachePolicy.ENABLED)
+        .build()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
     ) {
-        val context = LocalContext.current
-        val configuration = LocalConfiguration.current
-        val density = LocalDensity.current
-        val screenHeightPx = configuration.screenHeightDp.dp
-        val imageHeightPx = with(density) { (screenHeightPx * 0.4f).roundToPx() }
-
-        val screenWidthPx = configuration.screenWidthDp.dp
-        val imageWidthPx = with(density) { screenWidthPx.roundToPx() }
-
-        val imageRequest = ImageRequest.Builder(context)
-            .data(product.thumbnailUrl)
-            .size(imageWidthPx, imageHeightPx)
-            .crossfade(true)
-            .memoryCachePolicy(CachePolicy.ENABLED)
-            .diskCachePolicy(CachePolicy.ENABLED)
-            .build()
-
         SubcomposeAsyncImage(
             model = imageRequest,
             contentDescription = stringResource(R.string.product_image_content_description),
             contentScale = ContentScale.Fit,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(screenHeightPx * 0.4f)
+                .height(screenHeight * 0.4f)
         ) {
             when (painter.state) {
-                is coil.compose.AsyncImagePainter.State.Loading -> {
+                is AsyncImagePainter.State.Loading -> {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -114,7 +121,7 @@ fun ProductDetailContent(product: ProductUiModel) {
                     }
                 }
 
-                is coil.compose.AsyncImagePainter.State.Error -> {
+                is AsyncImagePainter.State.Error -> {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()

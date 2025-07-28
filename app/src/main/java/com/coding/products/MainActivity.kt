@@ -11,7 +11,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.coding.products.productdetails.ProductDetailScreen
+import com.coding.products.productdetails.ProductDetailStateful
 import com.coding.products.productlist.ProductListScreen
 import com.coding.products.ui.navigation.Screen
 import dagger.hilt.android.AndroidEntryPoint
@@ -58,7 +58,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             arguments = listOf(navArgument("productId") { type = NavType.IntType })
         ) { backStackEntry ->
             val productId = backStackEntry.arguments?.getInt("productId") ?: return@composable
-            ProductDetailScreen(productId)
+            ProductDetailStateful(productId)
         }
     }
 }

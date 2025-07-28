@@ -6,7 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.coding.products.form.FormScreen
+import com.coding.products.form.FormScreenStateful
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
@@ -31,5 +31,5 @@ class FormMainActivity : ComponentActivity() {
  */
 @Composable
 fun FormApp(modifier: Modifier = Modifier) {
-    FormScreen(modifier)
+    FormScreenStateful(modifier = modifier)
 }

@@ -41,12 +41,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.coding.products.R
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Locale
 
 @Composable
-fun FormScreen(
+fun FormScreenStateful(
     modifier: Modifier = Modifier,
     viewModel: FormViewModel = hiltViewModel()
 ) {
@@ -54,7 +55,7 @@ fun FormScreen(
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
 
-    FormContent(
+    FormScreenStateless(
         state = state,
         onNameChange = viewModel::onNameChange,
         onEmailChange = viewModel::onEmailChange,
@@ -66,6 +67,31 @@ fun FormScreen(
             focusManager.clearFocus()
             viewModel.validateForm(context)
         },
+        modifier = modifier
+    )
+}
+
+@Composable
+fun FormScreenStateless(
+    state: FormState,
+    onNameChange: (String) -> Unit,
+    onEmailChange: (String) -> Unit,
+    onPhoneChange: (String) -> Unit,
+    onPromoCodeChange: (String) -> Unit,
+    onDateChange: (String) -> Unit,
+    onRatingChange: (String) -> Unit,
+    onSubmit: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    FormContent(
+        state = state,
+        onNameChange = onNameChange,
+        onEmailChange = onEmailChange,
+        onPhoneChange = onPhoneChange,
+        onPromoCodeChange = onPromoCodeChange,
+        onDateChange = onDateChange,
+        onRatingChange = onRatingChange,
+        onSubmit = onSubmit,
         modifier = modifier
     )
 }
@@ -195,7 +221,7 @@ private fun ErrorText(text: String) {
 
 @Composable
 private fun DatePickerField(
-    date: java.time.LocalDate?,
+    date: LocalDate?,
     error: String?,
     onDateSelected: (String) -> Unit,
     context: Context
