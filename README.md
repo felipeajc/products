@@ -13,7 +13,7 @@ This is an Android project split into modules and flavors. The goal was to separ
 There are 2 product flavors defined:
 
 - `form`: shows a form screen with multiple input validations
-- `list`: loads a paged list of products from an API and local DB
+- `list`: loads a paged list of products from an API and local DB. When the user click on item list it should open details screen of the item list.
 
 You can switch between flavors in Android Studio using the **Build Variants** tool window.
 
@@ -80,6 +80,7 @@ Stuff like:
 
 ### Architecture
 
+- Clean Architecture
 - MVVM (ViewModel + StateFlow)
 - Clean module separation (domain doesn’t know about data or UI)
 - Dependency injection with Hilt
@@ -108,12 +109,13 @@ Each flavor has different resources (like `strings.xml`) and launch Activities. 
 - `stateIn`, `debounce`, `flatMapLatest` used to manage UI state with Flow
 - Image sizes dynamically calculated based on screen size
 - Custom error messages for each form field
+- Kotlin docs
 
 ## Dev setup
 
 - Kotlin 2.0.21
 - Android Gradle Plugin 8.1.1
-- Compile SDK 36, min SDK 24
+- Compile SDK 36, min SDK 26
 - OpenJDK 17
 
 ## Dependencies
@@ -124,6 +126,12 @@ Each flavor has different resources (like `strings.xml`) and launch Activities. 
 - Room
 - Hilt (DI)
 - Paging 3
+- Coroutines
+- Kotlin Flow
+
+## Future work
+## To-Do
+- Fix issue where the software keyboard overlaps form fields. Need to improve scrolling or use `imePadding()` where necessary.
 
 ## Author
 
