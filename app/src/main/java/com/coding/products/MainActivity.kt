@@ -16,6 +16,10 @@ import com.coding.products.productlist.ProductListScreen
 import com.coding.products.ui.navigation.Screen
 import dagger.hilt.android.AndroidEntryPoint
 
+/**
+ * Main entry point for the 'list' flavor of the app.
+ * Sets up Hilt DI and launches the Compose UI with app navigation.
+ */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,6 +32,10 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+/**
+ * Composable that handles the navigation graph.
+ * Starts on the product list screen, navigates to product detail.
+ */
 @Composable
 fun AppNavigation(modifier: Modifier = Modifier) {
     val navController = rememberNavController()

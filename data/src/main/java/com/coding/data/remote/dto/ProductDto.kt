@@ -1,5 +1,9 @@
 package com.coding.data.remote.dto
 
+/**
+ * Represents a product as returned from the API.
+ * This is the raw model mapped from the JSON response.
+ */
 data class ProductDto(
     val id: Int,
     val title: String,
@@ -25,12 +29,18 @@ data class ProductDto(
     val tags: List<String>? = null
 )
 
+/**
+ * Dimensions for a product. Optional and may not be present in all payloads.
+ */
 data class DimensionsDto(
     val width: Double? = null,
     val height: Double? = null,
     val depth: Double? = null
 )
 
+/**
+ * Represents a single review for a product.
+ */
 data class ReviewDto(
     val rating: Int? = null,
     val comment: String? = null,
@@ -39,6 +49,9 @@ data class ReviewDto(
     val reviewerEmail: String? = null
 )
 
+/**
+ * Misc metadata for a product — like when it was created, barcodes, etc.
+ */
 data class MetaDto(
     val createdAt: String? = null,
     val updatedAt: String? = null,

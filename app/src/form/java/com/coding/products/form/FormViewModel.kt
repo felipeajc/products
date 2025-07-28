@@ -11,27 +11,38 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 import javax.inject.Inject
 
+/**
+ * ViewModel that manages form state and validation logic.
+ * Updates each field independently and clears error states when changed.
+ * Full validation happens on form submission.
+ */
 @HiltViewModel
 class FormViewModel @Inject constructor() : ViewModel() {
+
     private val _formState = MutableStateFlow(FormState())
     val formState: StateFlow<FormState> = _formState.asStateFlow()
 
+    // Updates the name field and clears its error
     fun onNameChange(name: String) {
         _formState.value = _formState.value.copy(name = name, nameError = null)
     }
 
+    // Updates the email field and clears its error
     fun onEmailChange(email: String) {
         _formState.value = _formState.value.copy(email = email, emailError = null)
     }
 
+    // Updates the phone field and clears its error
     fun onPhoneChange(phone: String) {
         _formState.value = _formState.value.copy(phone = phone, phoneError = null)
     }
 
+    // Updates the promo code field and clears its error
     fun onPromoCodeChange(code: String) {
         _formState.value = _formState.value.copy(promoCode = code, promoCodeError = null)
     }
 
+    // Parses and updates the delivery date from a string
     fun onDateChange(dateString: String) {
         val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.getDefault())
         val parsedDate = try {
@@ -46,10 +57,15 @@ class FormViewModel @Inject constructor() : ViewModel() {
         )
     }
 
+    // Updates the rating field and clears its error
     fun onRatingChange(rating: String) {
         _formState.value = _formState.value.copy(rating = rating, ratingError = null)
     }
 
+    /**
+     * Runs all form validations.
+     * Updates the state with error messages (if any) and flags whether submission succeeded.
+     */
     fun validateForm(context: Context): Boolean {
         val state = _formState.value
 
@@ -69,7 +85,7 @@ class FormViewModel @Inject constructor() : ViewModel() {
             ratingError
         ).all { it == null }
 
-        val updatedState = state.copy(
+        _formState.value = state.copy(
             nameError = nameError,
             emailError = emailError,
             phoneError = phoneError,
@@ -79,8 +95,6 @@ class FormViewModel @Inject constructor() : ViewModel() {
             isSubmitting = true,
             formSubmittedSuccessfully = isValid
         )
-
-        _formState.value = updatedState
 
         return isValid
     }

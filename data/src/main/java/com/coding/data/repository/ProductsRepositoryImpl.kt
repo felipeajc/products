@@ -20,6 +20,12 @@ import javax.inject.Singleton
 private const val METADATA_KEY_PRODUCTS_TOTAL = "products_total"
 private const val PAGE_SIZE = 100
 
+/**
+ * Concrete implementation of [ProductsRepository].
+ *
+ * Handles API calls, Room caching, metadata, and paging.
+ * Used across the app to isolate data layer from domain.
+ */
 @Singleton
 class ProductsRepositoryImpl @Inject constructor(
     private val api: ProductsApi,
@@ -27,6 +33,13 @@ class ProductsRepositoryImpl @Inject constructor(
     private val metadataDao: MetadataDao
 ) : ProductsRepository {
 
+    /**
+     * Returns a paged list of products.
+     * If query is blank, returns everything from local DB.
+     * If there's a query, it tries to normalize and match against the DB.
+     *
+     * Everything is emitted as PagingData (even though we build it manually).
+     */
     override fun getPagedProducts(
         query: String?,
         category: String?
@@ -34,7 +47,10 @@ class ProductsRepositoryImpl @Inject constructor(
         val products = if (query.isNullOrBlank()) {
             dao.getAll()
         } else {
-            val normalizedTerms = normalizeText(query).split(" ").filter { it.isNotBlank() }
+            val normalizedTerms = normalizeText(query)
+                .split(" ")
+                .filter { it.isNotBlank() }
+
             normalizedTerms
                 .flatMap { dao.searchNormalized(it) }
                 .distinctBy { it.id }
@@ -43,6 +59,12 @@ class ProductsRepositoryImpl @Inject constructor(
         emit(PagingData.from(products.map { it.toDomain() }))
     }.flowOn(Dispatchers.IO)
 
+    /**
+     * Makes a paged request to the API and caches locally,
+     * but only if we haven’t already done it before (based on metadata).
+     *
+     * It stores the total count in a Metadata table so we don’t re-fetch everything again.
+     */
     override suspend fun fetchAndCacheAllProductsIfNeeded() {
         val existingTotal = metadataDao.getValue(METADATA_KEY_PRODUCTS_TOTAL)?.toIntOrNull()
         if (existingTotal != null) return
@@ -70,8 +92,10 @@ class ProductsRepositoryImpl @Inject constructor(
         metadataDao.insert(MetadataEntity(METADATA_KEY_PRODUCTS_TOTAL, total.toString()))
     }
 
-    // +++++++ Details +++++++++//
-
+    /**
+     * Fetches a product by ID from local DB.
+     * Used in detail screen – assumes cache is already filled.
+     */
     override suspend fun getProductById(id: Int): ProductDomainModel? {
         return dao.getById(id)?.toDomain()
     }

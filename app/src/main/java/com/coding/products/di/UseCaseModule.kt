@@ -9,10 +9,19 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 
+/**
+ * Hilt module that provides all the use cases needed throughout the app.
+ * Binds each use case to the ProductsRepository implementation.
+ *
+ * Installed in SingletonComponent, so everything here is available app-wide.
+ */
 @Module
 @InstallIn(SingletonComponent::class)
 object UseCaseModule {
 
+    /**
+     * Provides the use case for fetching and caching products only if needed.
+     */
     @Provides
     fun provideFetchProductsIfNeededUseCase(
         repository: ProductsRepository
@@ -20,6 +29,9 @@ object UseCaseModule {
         return FetchProductsIfNeededUseCase(repository)
     }
 
+    /**
+     * Provides the use case for paginating products based on optional filters.
+     */
     @Provides
     fun provideGetPagedProductsUseCase(
         repository: ProductsRepository
@@ -27,6 +39,9 @@ object UseCaseModule {
         return GetPagedProductsUseCase(repository)
     }
 
+    /**
+     * Provides the use case for fetching a single product by ID.
+     */
     @Provides
     fun provideGetProductByIdUseCase(
         repository: ProductsRepository
