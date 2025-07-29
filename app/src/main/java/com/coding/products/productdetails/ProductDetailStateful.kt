@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +30,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImagePainter
@@ -47,7 +50,8 @@ fun ProductDetailStateful(
     val context = LocalContext.current
 
     LaunchedEffect(productId) {
-        viewModel.loadProduct(context, productId)
+        val errorMessage = context.getString(R.string.error_loading_products)
+        viewModel.loadProduct(errorMessage, productId)
     }
 
     when {
@@ -190,4 +194,23 @@ fun ProductDetailStateless(product: ProductUiModel) {
 
         Spacer(modifier = Modifier.height(16.dp))
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ProductDetailPreview() {
+    ProductDetailStateless(
+        product = ProductUiModel(
+            id = 1,
+            title = "Macbook Pro M3",
+            description = "High-performance laptop",
+            priceFormatted = "$2,499.00",
+            discountFormatted = "15% OFF",
+            rating = 4.8,
+            ratingText = "4.8",
+            ratingIcon = Icons.Default.Star,
+            stockText = "In stock: 5 units",
+            thumbnailUrl = "" // Or use a mock URL
+        )
+    )
 }

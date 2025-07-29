@@ -1,97 +1,107 @@
 package com.coding.products.form
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import javax.inject.Inject
 
 /**
- * ViewModel that manages form state and validation logic.
- * Updates each field independently and clears error states when changed.
- * Full validation happens on form submission.
+ * ViewModel responsible for managing the form screen's UI state and validation logic.
+ *
+ * - Exposes the current [FormState] via [formState].
+ * - Updates each form field independently and clears its associated error on change.
+ * - Validates all fields during submission using [FormValidator].
  */
-@HiltViewModel
 class FormViewModel @Inject constructor() : ViewModel() {
 
     private val _formState = MutableStateFlow(FormState())
     val formState: StateFlow<FormState> = _formState.asStateFlow()
 
-    // Updates the name field and clears its error
+    /**
+     * Called when the user updates the "Name" field.
+     * Clears any previous validation error for that field.
+     */
     fun onNameChange(name: String) {
         _formState.value = _formState.value.copy(name = name, nameError = null)
     }
 
-    // Updates the email field and clears its error
+    /**
+     * Called when the user updates the "Email" field.
+     * Clears any previous validation error for that field.
+     */
     fun onEmailChange(email: String) {
         _formState.value = _formState.value.copy(email = email, emailError = null)
     }
 
-    // Updates the phone field and clears its error
+    /**
+     * Called when the user updates the "Phone" field.
+     * Clears any previous validation error for that field.
+     */
     fun onPhoneChange(phone: String) {
         _formState.value = _formState.value.copy(phone = phone, phoneError = null)
     }
 
-    // Updates the promo code field and clears its error
+    /**
+     * Called when the user updates the "Promo Code" field.
+     * Clears any previous validation error for that field.
+     */
     fun onPromoCodeChange(code: String) {
         _formState.value = _formState.value.copy(promoCode = code, promoCodeError = null)
     }
 
-    // Parses and updates the delivery date from a string
-    fun onDateChange(dateString: String) {
+    /**
+     * Parses and updates the delivery date from a string input.
+     * Clears any previous validation error for that field.
+     */
+    fun onDateChange(dateStr: String) {
         val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.getDefault())
-        val parsedDate = try {
-            LocalDate.parse(dateString, formatter)
-        } catch (e: Exception) {
-            null
-        }
+        val parsedDate = runCatching { LocalDate.parse(dateStr, formatter) }.getOrNull()
 
-        _formState.value = _formState.value.copy(
-            deliveryDate = parsedDate,
-            deliveryDateError = null
-        )
+        _formState.update {
+            it.copy(
+                deliveryDate = parsedDate,
+                deliveryDateError = if (parsedDate == null) FormValidationError.DateRequired else null
+            )
+        }
     }
 
-    // Updates the rating field and clears its error
+    /**
+     * Called when the user selects a rating.
+     * Clears any previous validation error for that field.
+     */
     fun onRatingChange(rating: String) {
         _formState.value = _formState.value.copy(rating = rating, ratingError = null)
     }
 
     /**
-     * Runs all form validations.
-     * Updates the state with error messages (if any) and flags whether submission succeeded.
+     * Runs full form validation and updates the UI state with any validation errors.
+     *
+     * @return `true` if all fields are valid, `false` otherwise.
      */
-    fun validateForm(context: Context): Boolean {
+    fun validateForm(): Boolean {
         val state = _formState.value
 
-        val nameError = FormValidator.validateName(context, state.name)
-        val emailError = FormValidator.validateEmail(context, state.email)
-        val phoneError = FormValidator.validateNumber(context, state.phone)
-        val promoCodeError = FormValidator.validatePromoCode(context, state.promoCode)
-        val dateError = FormValidator.validateDate(context, state.deliveryDate)
-        val ratingError = FormValidator.validateRating(context, state.rating)
+        val nameErr = FormValidator.validateName(state.name)
+        val emailErr = FormValidator.validateEmail(state.email)
+        val phoneErr = FormValidator.validateNumber(state.phone)
+        val promoErr = FormValidator.validatePromoCode(state.promoCode)
+        val dateErr = FormValidator.validateDate(state.deliveryDate)
+        val ratingErr = FormValidator.validateRating(state.rating)
 
-        val isValid = listOf(
-            nameError,
-            emailError,
-            phoneError,
-            promoCodeError,
-            dateError,
-            ratingError
-        ).all { it == null }
+        val isValid = listOf(nameErr, emailErr, phoneErr, promoErr, dateErr, ratingErr).all { it == null }
 
         _formState.value = state.copy(
-            nameError = nameError,
-            emailError = emailError,
-            phoneError = phoneError,
-            promoCodeError = promoCodeError,
-            deliveryDateError = dateError,
-            ratingError = ratingError,
+            nameError = nameErr,
+            emailError = emailErr,
+            phoneError = phoneErr,
+            promoCodeError = promoErr,
+            deliveryDateError = dateErr,
+            ratingError = ratingErr,
             isSubmitting = true,
             formSubmittedSuccessfully = isValid
         )

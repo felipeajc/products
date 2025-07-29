@@ -53,19 +53,18 @@ fun FormScreenStateful(
 ) {
     val state by viewModel.formState.collectAsState()
     val focusManager = LocalFocusManager.current
-    val context = LocalContext.current
 
     FormScreenStateless(
         state = state,
         onNameChange = viewModel::onNameChange,
         onEmailChange = viewModel::onEmailChange,
-        onPhoneChange = viewModel::onPhoneChange,
+        onPhoneChange = { viewModel.onPhoneChange(it.take(12)) },
         onPromoCodeChange = { viewModel.onPromoCodeChange(it.take(7)) },
         onDateChange = viewModel::onDateChange,
         onRatingChange = viewModel::onRatingChange,
         onSubmit = {
             focusManager.clearFocus()
-            viewModel.validateForm(context)
+            viewModel.validateForm()
         },
         modifier = modifier
     )
@@ -73,31 +72,6 @@ fun FormScreenStateful(
 
 @Composable
 fun FormScreenStateless(
-    state: FormState,
-    onNameChange: (String) -> Unit,
-    onEmailChange: (String) -> Unit,
-    onPhoneChange: (String) -> Unit,
-    onPromoCodeChange: (String) -> Unit,
-    onDateChange: (String) -> Unit,
-    onRatingChange: (String) -> Unit,
-    onSubmit: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    FormContent(
-        state = state,
-        onNameChange = onNameChange,
-        onEmailChange = onEmailChange,
-        onPhoneChange = onPhoneChange,
-        onPromoCodeChange = onPromoCodeChange,
-        onDateChange = onDateChange,
-        onRatingChange = onRatingChange,
-        onSubmit = onSubmit,
-        modifier = modifier
-    )
-}
-
-@Composable
-fun FormContent(
     state: FormState,
     onNameChange: (String) -> Unit,
     onEmailChange: (String) -> Unit,
@@ -123,7 +97,7 @@ fun FormContent(
                 label = stringResource(R.string.form_name_label),
                 value = state.name,
                 onValueChange = onNameChange,
-                error = state.nameError,
+                error = state.nameError.asString(context),
                 keyboardType = KeyboardType.Text
             )
         }
@@ -132,7 +106,7 @@ fun FormContent(
                 label = stringResource(R.string.form_email_label),
                 value = state.email,
                 onValueChange = onEmailChange,
-                error = state.emailError,
+                error = state.emailError.asString(context),
                 keyboardType = KeyboardType.Email
             )
         }
@@ -141,7 +115,7 @@ fun FormContent(
                 label = stringResource(R.string.form_phone_label),
                 value = state.phone,
                 onValueChange = onPhoneChange,
-                error = state.phoneError,
+                error = state.phoneError.asString(context),
                 keyboardType = KeyboardType.Number
             )
         }
@@ -150,7 +124,7 @@ fun FormContent(
                 label = stringResource(R.string.form_promo_code_label),
                 value = state.promoCode,
                 onValueChange = onPromoCodeChange,
-                error = state.promoCodeError,
+                error = state.promoCodeError.asString(context),
                 keyboardType = KeyboardType.Text
             )
         }
@@ -159,27 +133,30 @@ fun FormContent(
                 selected = state.rating,
                 onSelectedChange = onRatingChange,
                 isError = state.ratingError != null,
-                errorText = state.ratingError
+                errorText = state.ratingError.asString(context),
             )
         }
         item {
             DatePickerField(
                 date = state.deliveryDate,
-                error = state.deliveryDateError,
+                error = state.deliveryDateError.asString(context),
                 onDateSelected = onDateChange,
                 context = context
             )
         }
         item {
             Spacer(modifier = Modifier.height(24.dp))
-            Button(onClick = onSubmit, modifier = Modifier.fillMaxWidth()) {
+            Button(
+                onClick = onSubmit,
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 Text(stringResource(R.string.form_submit))
             }
         }
         if (state.formSubmittedSuccessfully) {
             item {
                 Text(
-                    stringResource(R.string.form_success),
+                    text = stringResource(R.string.form_success),
                     color = MaterialTheme.colorScheme.primary
                 )
             }
@@ -346,8 +323,8 @@ fun showDatePickerDialog(
 @Composable
 fun FormScreenPreview() {
     MaterialTheme {
-        FormContent(
-            state = FormState(),
+        FormScreenStateless(
+            state = FormState(formSubmittedSuccessfully = true),
             onNameChange = {},
             onEmailChange = {},
             onPhoneChange = {},

@@ -1,10 +1,8 @@
 package com.coding.products.productdetails
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.coding.domain.usecase.GetProductByIdUseCase
-import com.coding.products.R
 import com.coding.products.model.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +19,7 @@ class ProductDetailViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ProductDetailUiState())
     val uiState: StateFlow<ProductDetailUiState> = _uiState.asStateFlow()
 
-    fun loadProduct(context: Context, id: Int) {
+    fun loadProduct(errorMessage: String, id: Int) {
         _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
 
         viewModelScope.launch {
@@ -32,7 +30,7 @@ class ProductDetailViewModel @Inject constructor(
                 _uiState.value = ProductDetailUiState(
                     product = null,
                     isLoading = false,
-                    errorMessage = context.getString(R.string.error_loading_products)
+                    errorMessage = errorMessage
                 )
             }
         }

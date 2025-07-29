@@ -30,23 +30,17 @@ import java.time.LocalDate
  */
 data class FormState(
     val name: String = "",
-    val nameError: String? = null,
-
+    val nameError: FormValidationError? = null,
     val email: String = "",
-    val emailError: String? = null,
-
+    val emailError: FormValidationError? = null,
     val phone: String = "",
-    val phoneError: String? = null,
-
+    val phoneError: FormValidationError? = null,
     val promoCode: String = "",
-    val promoCodeError: String? = null,
-
+    val promoCodeError: FormValidationError? = null,
     val deliveryDate: LocalDate? = null,
-    val deliveryDateError: String? = null,
-
+    val deliveryDateError: FormValidationError? = null,
     val rating: String = "",
-    val ratingError: String? = null,
-
+    val ratingError: FormValidationError? = null,
     val isSubmitting: Boolean = false,
     val formSubmittedSuccessfully: Boolean = false
 )
