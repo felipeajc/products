@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -14,14 +16,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.coding.products.R
-import com.coding.products.model.ProductUiModel
 
 @Composable
 fun ProductItem(
-    product: ProductUiModel,
+    title: String,
+    ratingText: String,
+    ratingIcon: ImageVector,
     onClick: () -> Unit
 ) {
     Card(
@@ -38,8 +42,8 @@ fun ProductItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = product.ratingIcon,
-                contentDescription = stringResource(R.string.desc_rating_icon),
+                imageVector = ratingIcon,
+                contentDescription = null, // could also use: stringResource(R.string.desc_rating_icon)
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .size(32.dp)
@@ -48,12 +52,12 @@ fun ProductItem(
 
             Column {
                 Text(
-                    text = product.title,
+                    text = title,
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = product.ratingText,
+                    text = ratingText,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.secondary
                 )

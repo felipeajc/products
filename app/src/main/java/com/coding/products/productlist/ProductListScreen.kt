@@ -127,7 +127,9 @@ private fun ProductListStateWrapper(
                 LazyColumn {
                     items(pagingItems.itemSnapshotList.items) { product ->
                         ProductItem(
-                            product = product,
+                            title = product.title,
+                            ratingText = product.ratingText,
+                            ratingIcon = product.ratingIcon,
                             onClick = { onItemClick(product.id) }
                         )
                     }
