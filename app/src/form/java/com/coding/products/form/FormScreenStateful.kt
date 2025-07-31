@@ -2,35 +2,14 @@ package com.coding.products.form
 
 import android.app.DatePickerDialog
 import android.content.Context
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -43,8 +22,7 @@ import com.coding.products.R
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.Calendar
-import java.util.Locale
+import java.util.*
 
 @Composable
 fun FormScreenStateful(
@@ -82,8 +60,13 @@ fun FormScreenStateless(
     onSubmit: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
     val scrollState = rememberLazyListState()
+    val nameError = state.nameError?.let { stringResource(it.messageRes) }
+    val emailError = state.emailError?.let { stringResource(it.messageRes) }
+    val phoneError = state.phoneError?.let { stringResource(it.messageRes) }
+    val promoError = state.promoCodeError?.let { stringResource(it.messageRes) }
+    val dateError = state.deliveryDateError?.let { stringResource(it.messageRes) }
+    val ratingError = state.ratingError?.let { stringResource(it.messageRes) }
 
     LazyColumn(
         state = scrollState,
@@ -97,7 +80,7 @@ fun FormScreenStateless(
                 label = stringResource(R.string.form_name_label),
                 value = state.name,
                 onValueChange = onNameChange,
-                error = state.nameError.asString(context),
+                error = nameError,
                 keyboardType = KeyboardType.Text
             )
         }
@@ -106,7 +89,7 @@ fun FormScreenStateless(
                 label = stringResource(R.string.form_email_label),
                 value = state.email,
                 onValueChange = onEmailChange,
-                error = state.emailError.asString(context),
+                error = emailError,
                 keyboardType = KeyboardType.Email
             )
         }
@@ -115,7 +98,7 @@ fun FormScreenStateless(
                 label = stringResource(R.string.form_phone_label),
                 value = state.phone,
                 onValueChange = onPhoneChange,
-                error = state.phoneError.asString(context),
+                error = phoneError,
                 keyboardType = KeyboardType.Number
             )
         }
@@ -124,7 +107,7 @@ fun FormScreenStateless(
                 label = stringResource(R.string.form_promo_code_label),
                 value = state.promoCode,
                 onValueChange = onPromoCodeChange,
-                error = state.promoCodeError.asString(context),
+                error = promoError,
                 keyboardType = KeyboardType.Text
             )
         }
@@ -133,15 +116,14 @@ fun FormScreenStateless(
                 selected = state.rating,
                 onSelectedChange = onRatingChange,
                 isError = state.ratingError != null,
-                errorText = state.ratingError.asString(context),
+                errorText = ratingError
             )
         }
         item {
             DatePickerField(
                 date = state.deliveryDate,
-                error = state.deliveryDateError.asString(context),
-                onDateSelected = onDateChange,
-                context = context
+                error = dateError,
+                onDateSelected = onDateChange
             )
         }
         item {
@@ -200,9 +182,9 @@ private fun ErrorText(text: String) {
 private fun DatePickerField(
     date: LocalDate?,
     error: String?,
-    onDateSelected: (String) -> Unit,
-    context: Context
+    onDateSelected: (String) -> Unit
 ) {
+    val context = LocalContext.current
     val formattedDate = date?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
         ?: stringResource(R.string.form_select_date)
 

@@ -6,84 +6,94 @@ import java.time.LocalDate
 
 /**
  * Utility object for validating each field in the form.
- * Handles simple business rules + error messages via [FormValidationError].
+ * Handles simple business rules and returns [FormValidationError] when invalid.
  */
 object FormValidator {
 
     /**
-     * Checks if name is not blank.
-     * Returns error if invalid, null if OK.
+     * Validates the name field.
+     * @return [FormValidationError.NameRequired] if blank, otherwise null.
      */
     fun validateName(name: String): FormValidationError? {
-        return if (name.isBlank()) FormValidationError.NameRequired else null
+        val nameError = if (name.isBlank()) FormValidationError.NameRequired else null
+        return nameError
     }
 
     /**
-     * Basic email validation.
-     * Must match pattern like "something@domain.com".
+     * Validates the email format and presence.
+     * @return appropriate [FormValidationError] or null if valid.
      */
     fun validateEmail(email: String): FormValidationError? {
         val emailPattern = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}".toRegex()
-        return when {
+
+        val emailError = when {
             email.isBlank() -> FormValidationError.EmailRequired
             !email.matches(emailPattern) -> FormValidationError.EmailInvalid
             else -> null
         }
+
+        return emailError
     }
 
     /**
-     * Checks if the number is not blank and only contains digits.
+     * Validates phone number format.
+     * @return [FormValidationError.PhoneRequired], PhoneInvalid, or null.
      */
     fun validateNumber(phone: String): FormValidationError? {
-        return when {
+        val phoneError = when {
             phone.isBlank() -> FormValidationError.PhoneRequired
             !phone.all { it.isDigit() } -> FormValidationError.PhoneInvalid
             else -> null
         }
+
+        return phoneError
     }
 
     /**
-     * Promo code must:
-     * - Be all caps
-     * - No accents
-     * - 3 to 7 characters (letters or dash)
+     * Validates the promo code format.
+     * - Must be all caps.
+     * - No accents.
+     * - 3 to 7 characters (A-Z or '-').
      */
     fun validatePromoCode(code: String): FormValidationError? {
-        if (code.isBlank()) return FormValidationError.PromoRequired
+        val normalizedCode = removeAccents(code)
+        val isValidPattern = "^[A-Z\\-]{3,7}$".toRegex().matches(code)
 
-        val normalized = removeAccents(code)
-        val validChars = "^[A-Z\\-]{3,7}$".toRegex()
-
-        return when {
-            normalized != code -> FormValidationError.PromoAccentsNotAllowed
-            !validChars.matches(code) -> FormValidationError.PromoInvalidFormat
+        val promoCodeError = when {
+            code.isBlank() -> FormValidationError.PromoRequired
+            normalizedCode != code -> FormValidationError.PromoAccentsNotAllowed
+            !isValidPattern -> FormValidationError.PromoInvalidFormat
             else -> null
         }
+
+        return promoCodeError
     }
 
     /**
-     * Valid delivery date:
-     * - Not null
-     * - Not in future
-     * - Not Monday (business logic)
+     * Validates the selected delivery date.
+     * - Must not be null, in the future, or a Monday.
      */
     fun validateDate(date: LocalDate?): FormValidationError? {
-        if (date == null) return FormValidationError.DateRequired
-        if (date.dayOfWeek == DayOfWeek.MONDAY) return FormValidationError.DateIsMonday
-        if (date.isAfter(LocalDate.now())) return FormValidationError.DateInFuture
-        return null
+        val dateError = when {
+            date == null -> FormValidationError.DateRequired
+            date.dayOfWeek == DayOfWeek.MONDAY -> FormValidationError.DateIsMonday
+            date.isAfter(LocalDate.now()) -> FormValidationError.DateInFuture
+            else -> null
+        }
+
+        return dateError
     }
 
     /**
-     * Rating must be filled in.
+     * Validates that a rating has been selected.
      */
     fun validateRating(rating: String): FormValidationError? {
-        return if (rating.isBlank()) FormValidationError.RatingRequired else null
+        val ratingError = if (rating.isBlank()) FormValidationError.RatingRequired else null
+        return ratingError
     }
 
     /**
-     * Removes accents from input.
-     * Used to normalize promo code.
+     * Removes accents from a given string.
      */
     private fun removeAccents(input: String): String {
         return Normalizer.normalize(input, Normalizer.Form.NFD)

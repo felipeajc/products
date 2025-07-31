@@ -1,7 +1,5 @@
-package com.coding.products
+package com.coding.products.form
 
-import com.coding.products.form.FormValidationError
-import com.coding.products.form.FormValidator
 import junit.framework.TestCase.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test

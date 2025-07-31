@@ -27,7 +27,7 @@ class FormViewModel @Inject constructor() : ViewModel() {
      * Clears any previous validation error for that field.
      */
     fun onNameChange(name: String) {
-        _formState.value = _formState.value.copy(name = name, nameError = null)
+        _formState.update { it.copy(name = name, nameError = null) }
     }
 
     /**
@@ -35,7 +35,7 @@ class FormViewModel @Inject constructor() : ViewModel() {
      * Clears any previous validation error for that field.
      */
     fun onEmailChange(email: String) {
-        _formState.value = _formState.value.copy(email = email, emailError = null)
+        _formState.update { it.copy(email = email, emailError = null) }
     }
 
     /**
@@ -43,7 +43,7 @@ class FormViewModel @Inject constructor() : ViewModel() {
      * Clears any previous validation error for that field.
      */
     fun onPhoneChange(phone: String) {
-        _formState.value = _formState.value.copy(phone = phone, phoneError = null)
+        _formState.update { it.copy(phone = phone, phoneError = null) }
     }
 
     /**
@@ -51,7 +51,7 @@ class FormViewModel @Inject constructor() : ViewModel() {
      * Clears any previous validation error for that field.
      */
     fun onPromoCodeChange(code: String) {
-        _formState.value = _formState.value.copy(promoCode = code, promoCodeError = null)
+        _formState.update { it.copy(promoCode = code, promoCodeError = null) }
     }
 
     /**
@@ -75,7 +75,7 @@ class FormViewModel @Inject constructor() : ViewModel() {
      * Clears any previous validation error for that field.
      */
     fun onRatingChange(rating: String) {
-        _formState.value = _formState.value.copy(rating = rating, ratingError = null)
+        _formState.update { it.copy(rating = rating, ratingError = null) }
     }
 
     /**
@@ -86,25 +86,34 @@ class FormViewModel @Inject constructor() : ViewModel() {
     fun validateForm(): Boolean {
         val state = _formState.value
 
-        val nameErr = FormValidator.validateName(state.name)
-        val emailErr = FormValidator.validateEmail(state.email)
-        val phoneErr = FormValidator.validateNumber(state.phone)
-        val promoErr = FormValidator.validatePromoCode(state.promoCode)
-        val dateErr = FormValidator.validateDate(state.deliveryDate)
-        val ratingErr = FormValidator.validateRating(state.rating)
+        val nameError = FormValidator.validateName(state.name)
+        val emailError = FormValidator.validateEmail(state.email)
+        val phoneError = FormValidator.validateNumber(state.phone)
+        val promoCodeError = FormValidator.validatePromoCode(state.promoCode)
+        val dateError = FormValidator.validateDate(state.deliveryDate)
+        val ratingError = FormValidator.validateRating(state.rating)
 
-        val isValid = listOf(nameErr, emailErr, phoneErr, promoErr, dateErr, ratingErr).all { it == null }
+        val isValid = listOf(
+            nameError,
+            emailError,
+            phoneError,
+            promoCodeError,
+            dateError,
+            ratingError
+        ).all { it == null }
 
-        _formState.value = state.copy(
-            nameError = nameErr,
-            emailError = emailErr,
-            phoneError = phoneErr,
-            promoCodeError = promoErr,
-            deliveryDateError = dateErr,
-            ratingError = ratingErr,
-            isSubmitting = true,
-            formSubmittedSuccessfully = isValid
-        )
+        _formState.update {
+            it.copy(
+                nameError = nameError,
+                emailError = emailError,
+                phoneError = phoneError,
+                promoCodeError = promoCodeError,
+                deliveryDateError = dateError,
+                ratingError = ratingError,
+                isSubmitting = true,
+                formSubmittedSuccessfully = isValid
+            )
+        }
 
         return isValid
     }
